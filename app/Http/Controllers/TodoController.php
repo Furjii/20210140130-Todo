@@ -12,9 +12,14 @@ class TodoController extends Controller
      */
     public function index()
     {
-        $todos = Todo::where('user_id',auth()->user()->id)->get();
-        dd($todos);
-        return view('todo.index');
+        $todos = Todo::where('user_id', auth()->user()->id)
+            ->orderBy('is_complete', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // dd($todos);
+
+        return view('todo.index', compact('todos'));
     }
 
     /**
@@ -23,15 +28,23 @@ class TodoController extends Controller
     public function create()
     {
         return view('todo.create');
-
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Todo $todo)
     {
-        //
+        $request->validate([
+            'title' => 'required|max:255',
+        ]);
+
+        $todo = Todo::create([
+            'title' => ucfirst($request->title),
+            'user_id' => auth()->user()->id,
+        ]);
+
+        return redirect()->route('todo.index')->with('success', 'Todo created successfully!');
     }
 
     /**
@@ -39,7 +52,7 @@ class TodoController extends Controller
      */
     public function show(Todo $todo)
     {
-        //
+        //nampilin satu2
     }
 
     /**
@@ -48,7 +61,6 @@ class TodoController extends Controller
     public function edit(Todo $todo)
     {
         return view('todo.edit');
-
     }
 
     /**
@@ -56,7 +68,7 @@ class TodoController extends Controller
      */
     public function update(Request $request, Todo $todo)
     {
-        //
+        //update sesuatu
     }
 
     /**
@@ -64,6 +76,6 @@ class TodoController extends Controller
      */
     public function destroy(Todo $todo)
     {
-        //
+        //hapus data
     }
 }
